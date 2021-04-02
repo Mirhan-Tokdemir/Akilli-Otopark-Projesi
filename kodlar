@@ -1,0 +1,89 @@
+// ESP32
+#define BLYNK_PRINT Serial
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
+
+//128x32 OLED EKRAN
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+//BLYNK LED ve lcd
+WidgetLED led1(V0); //register to virtual pin 1
+WidgetLED led2(V1); //register to virtual pin 1
+
+int trigPin = 32;    // Trigger
+int echoPin = 33;    // Echo
+long duration, cm, inches;
+char auth[] ="-M3sVf2mwkILdanphe2CjImO9ZVJH5KS";
+char ssid[] = "TurkTelekom_ZETKV";
+char pass[] = "aA647A2B7Af44";
+
+int val=4;
+int pos=0;
+
+void setup()
+{
+  Serial.begin(115200);
+  Blynk.begin(auth, ssid, pass);
+ //128X32 OLED
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);}
+  delay(2000);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 10);
+  //mesafe sensörü
+   pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+ }
+void loop()
+{
+  Blynk.run();
+  // OLED
+  display.display();
+  // MESAFE SENSÖRÜ 
+    digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  pinMode(echoPin, INPUT);
+  duration = pulseIn(echoPin, HIGH);
+  cm = (duration/2) / 29.1;     
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
+  delay(250);
+  //BLYNK LED
+  if(cm>20)
+  {
+  display.setCursor(0,4); 
+  display.setTextSize(1); 
+  display.println("No: 4 uygun");
+  display.display();
+  
+  Blynk.virtualWrite(V3, val);
+  led1.on();
+  led2.off();
+  delay(3000);
+  display.clearDisplay();
+    }
+  else{
+  display.setCursor(0,4);
+  display.setTextSize(1); 
+  display.println("No: 4 uygun degil");
+  display.display();
+  Blynk.virtualWrite(V3, 0);
+  led1.off();
+  led2.on();
+  delay(3000);
+  display.clearDisplay();
+      }
+  
+}

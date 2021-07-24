@@ -20,7 +20,7 @@ int echoPin = 33;    // Echo
 long duration, cm, inches;
 char auth[] ="-M3sVf2mwkILdanphe2CjImO9ZVJH5KS";
 char ssid[] = "TurkTelekom_ZETKV";
-char pass[] = "aA647A2B7Af44";
+char pass[] = "*****";
 
 int val=4;
 int pos=0;
